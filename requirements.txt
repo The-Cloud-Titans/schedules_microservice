@@ -1,3 +1,9 @@
 # https://pypi.org/project/Flask
 Flask==2.2.3
 Werkzeug==2.2.2
+
+# Google Cloud Firestore
+google-cloud-firestore==2.3.2
+
+# dotenv for managing environment variables
+python-dotenv==0.19.1
