@@ -11,9 +11,9 @@ credentials_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 
 db = firestore.Client.from_service_account_json(credentials_path)
 
-app = flask.Flask(__name__)
+#app = flask.Flask(__name__)
 
-@app.route("/fetch_data")
+# @app.route("/fetch_data")
 def fetch_data():
     schedules_ref = db.collection("schedules")
     schedules = schedules_ref.stream()

@@ -1,7 +1,7 @@
 # https://pypi.org/project/Flask
 Flask==2.2.3
 Werkzeug==2.2.2
-
+jsonify
 # Google Cloud Firestore
 google-cloud-firestore==2.3.2
 
