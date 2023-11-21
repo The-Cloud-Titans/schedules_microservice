@@ -29,26 +29,27 @@ def get_schedules(uni):
     for schedule in query:
         data = schedule.to_dict()
         schedule_info = {
-            "document_id": schedule.id,
+            "schedule_id": schedule.id,
             "name": data.get("name", "N/A"),
-            "email": data.get("email_id", "N/A"),
+            "email_id": data.get("email_id", "N/A"),
             "degree": data.get("degree", "N/A"),
-            "major": data.get("major1", "N/A"),
+            "major1": data.get("major1", "N/A"),
             "planned_semesters": data.get("planned_semesters", "N/A"),
+            "previous_semesters": data.get("previous_semesters","N/A"),
             "uni":data.get("uni","N/A"),
         }
 
         # Displaying courses information
-        courses = data.get('planned_semesters', [])
-        schedule_info["courses"] = []
-        for semester_courses in courses:
-            for course in semester_courses.get("courses", []):
-                course_info = {
-                    "course_code": course.get("course_code", "N/A"),
-                    "course_name": course.get("course_name", "N/A"),
-                    "credits": course.get("credits", "N/A"),
-                }
-                schedule_info["courses"].append(course_info)
+        # courses = data.get('planned_semesters', [])
+        # schedule_info["courses"] = []
+        # for semester_courses in courses:
+        #     for course in semester_courses.get("courses", []):
+        #         course_info = {
+        #             "course_code": course.get("course_code", "N/A"),
+        #             "course_name": course.get("course_name", "N/A"),
+        #             "credits": course.get("credits", "N/A"),
+        #         }
+        #         schedule_info["courses"].append(course_info)
         schedules_data.append(schedule_info)
 
     return jsonify({"schedules": schedules_data}), 200
@@ -69,26 +70,27 @@ def get_schedule_by_id(uni, schedule_id):
         return jsonify({"error": "Schedule does not belong to the specified user. Access not granted"}), 403
 
     schedule_info = {
-        "document_id": schedule_doc.id,
+        "schedule_id": schedule_doc.id,
         "name": data.get("name", "N/A"),
-        "email": data.get("email_id", "N/A"),
+        "email_id": data.get("email_id", "N/A"),
         "degree": data.get("degree", "N/A"),
-        "major": data.get("major1", "N/A"),
+        "major1": data.get("major1", "N/A"),
         "planned_semesters": data.get("planned_semesters", "N/A"),
+        "previous_semesters": data.get("previous_semesters", "N/A"),
         "uni": data.get("uni", "N/A"),
     }
 
     # Displaying courses information
-    courses = data.get('planned_semesters', [])
-    schedule_info["courses"] = []
-    for semester_courses in courses:
-        for course in semester_courses.get("courses", []):
-            course_info = {
-                "course_code": course.get("course_code", "N/A"),
-                "course_name": course.get("course_name", "N/A"),
-                "credits": course.get("credits", "N/A"),
-            }
-            schedule_info["courses"].append(course_info)
+    # courses = data.get('planned_semesters', [])
+    # schedule_info["courses"] = []
+    # for semester_courses in courses:
+    #     for course in semester_courses.get("courses", []):
+    #         course_info = {
+    #             "course_code": course.get("course_code", "N/A"),
+    #             "course_name": course.get("course_name", "N/A"),
+    #             "credits": course.get("credits", "N/A"),
+    #         }
+    #         schedule_info["courses"].append(course_info)
 
     return jsonify({"schedule": schedule_info}), 200
 
@@ -100,7 +102,7 @@ def create_schedule(uni):
         #print(schedule_data)
 
         # Validate that the request contains necessary data
-        required_fields = ["name", "email_id", "degree", "major1", "planned_semesters"]
+        required_fields = ["name", "email_id", "degree", "major1", "planned_semesters", "previous_semesters"]
         for field in required_fields:
             if field not in schedule_data:
                 return jsonify({"error": f"Missing required field: {field}"}), 400
@@ -121,6 +123,62 @@ def create_schedule(uni):
         # Respond with a success message and the document_id
         return jsonify({"message": f"Schedule with {new_document_id} was created"}), 202
 
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/users/<uni>/schedules/<schedule_id>", methods=["PUT"])
+def update_schedule(uni, schedule_id):
+    try:
+        # Assuming the request contains JSON data with updated schedule information
+        updated_schedule_data = request.json
+
+        # Fetch data from Firestore using schedule_id
+        schedules_ref = db.collection("schedules").document(schedule_id)
+        schedule_data = schedules_ref.get().to_dict()
+
+        # Verify if the uni in the fetched data matches uni in the URL
+        if schedule_data.get("uni") != uni:
+            return jsonify({"error": f"Schedule with {schedule_id} does not belong to user with uni {uni}"}), 400
+
+        # Define fields that are not allowed to be updated
+        fields_not_allowed_to_update = ["name", "email_id", "uni"]
+
+        # Check if request body contains fields not allowed to be updated
+        disallowed_fields = set(updated_schedule_data.keys()) & set(fields_not_allowed_to_update)
+        if disallowed_fields:
+            return jsonify({"error": f"Fields not allowed to be updated: {', '.join(disallowed_fields)}"}), 400
+
+        # Remove fields that should not be updated
+        for field in fields_not_allowed_to_update:
+            updated_schedule_data.pop(field, None)
+
+        # Update the schedule in Firestore
+        schedules_ref = db.collection("schedules").document(schedule_id)
+        schedules_ref.update(updated_schedule_data)
+
+        # Respond with a success message
+        return jsonify({"message": f"Schedule with {schedule_id} has been updated"}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/users/<uni>/schedules/<schedule_id>", methods=["DELETE"])
+def delete_schedule(uni, schedule_id):
+    try:
+        # Fetch data from Firestore using schedule_id
+        schedules_ref = db.collection("schedules").document(schedule_id)
+        schedule_data = schedules_ref.get().to_dict()
+
+        # Verify if the uni in the fetched data matches uni in the URL
+        if schedule_data.get("uni") != uni:
+            return jsonify({"error": f"Schedule with {schedule_id} does not belong to user with uni {uni}"}), 400
+
+        # Delete the schedule from Firestore
+        schedules_ref.delete()
+
+        # Respond with a success message
+        return jsonify({"message": f"Schedule with {schedule_id} has been deleted"}), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
