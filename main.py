@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from db import db, fetch_data
 import boto3
+import json
 
 sns = boto3.client('sns', region_name='us-east-2')
 
@@ -134,7 +135,7 @@ def create_schedule(uni):
         }
 
         sns.publish(
-            TopicArn='your_sns_topic_arn',  # Replace with your SNS topic ARN
+            TopicArn='arn:aws:sns:us-east-2:256273164694:ScheduleChangeTopic',
             Message=json.dumps(sns_message),
             MessageStructure='string'
         )
