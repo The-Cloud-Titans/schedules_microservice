@@ -1,5 +1,8 @@
 from flask import Flask, jsonify, request
 from db import db, fetch_data
+import boto3
+
+sns = boto3.client('sns', region_name='us-east-2')
 
 # If `entrypoint` is not defined in app.yaml, App Engine will look for an app
 # called `app` in `main.py`.
@@ -119,6 +122,22 @@ def create_schedule(uni):
 
         # Get the auto-generated document ID from the tuple
         new_document_id = new_schedule_ref[1].id
+
+        # Publish a message to SNS
+        sns_message = {
+            "schedule_info": {
+                "schedule_id": new_document_id,
+                "name": schedule_data.get("name", "N/A"),
+                "degree": schedule_data.get("degree", "N/A"),
+            },
+            "email_address": schedule_data.get("email_id", "N/A")
+        }
+
+        sns.publish(
+            TopicArn='your_sns_topic_arn',  # Replace with your SNS topic ARN
+            Message=json.dumps(sns_message),
+            MessageStructure='string'
+        )
 
         # Respond with a success message and the document_id
         return jsonify({"message": f"Schedule with {new_document_id} was created"}), 202
