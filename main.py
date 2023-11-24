@@ -120,22 +120,57 @@ def create_schedule(uni):
         # Add the schedule to Firestore
         schedules_ref = db.collection("schedules")
         new_schedule_ref = schedules_ref.add(schedule_data)
-
+        print(new_schedule_ref)
         # Get the auto-generated document ID from the tuple
         new_document_id = new_schedule_ref[1].id
+        print("new_document_id="+new_document_id)
 
-        new_schedule_doc_ref = schedules_ref.document(new_document_id)
-        new_schedule_doc = new_schedule_doc_ref.get()
+        # Get the document reference from the tuple
+        new_schedule_doc_ref = new_schedule_ref[1]
 
-        # Construct the text message with all details
+        # Get the document data
+        new_schedule_doc = new_schedule_doc_ref.get().to_dict()
+
+        # Extracting planned_semesters information
+        planned_semesters = new_schedule_doc.get('planned_semesters', [])
+        previous_semesters = new_schedule_doc.get('previous_semesters',[])
+
+        # Constructing formatted_message
         formatted_message = (
             "Hello,\nYour new schedule was created. Here is your copy:\n\n"
             f"Name: {new_schedule_doc.get('name', 'N/A')}\n"
             f"Degree: {new_schedule_doc.get('degree', 'N/A')}\n"
             f"Major 1: {new_schedule_doc.get('major1', 'N/A')}\n"
-            f"Planned Semesters: {new_schedule_doc.get('planned_semesters', 'N/A')}\n"
-            f"Previous Semesters: {new_schedule_doc.get('previous_semesters', 'N/A')}\n"
+            "Planned Semesters:\n"
         )
+
+        # Iterating through each semester
+        for semester in planned_semesters:
+            formatted_message += f"  Semester: {semester['semester']}\n"
+            formatted_message += f"  Max Credits: {semester['max_credits']}\n"
+
+            # Iterating through each course in the semester
+            formatted_message += "  Courses:\n"
+            for course in semester.get('courses', []):
+                formatted_message += f"    Course Code: {course.get('course_code', 'N/A')}\n"
+                formatted_message += f"    Course Name: {course.get('course_name', 'N/A')}\n"
+                formatted_message += f"    Credits: {course.get('credits', 'N/A')}\n"
+                formatted_message += f"\n"
+
+        # formatted_message += "\nPrevious Semesters:\n"
+        # # Iterating through each semester
+        # for semester in previous_semesters:
+        #     formatted_message += f"  Semester: {semester['semester']}\n"
+        #     formatted_message += f"  Max Credits: {semester['max_credits']}\n"
+        #
+        #     # Iterating through each course in the semester
+        #     formatted_message += "  Courses:\n"
+        #     for course in semester.get('courses', []):
+        #         formatted_message += f"    Course Code: {course.get('course_code', 'N/A')}\n"
+        #         formatted_message += f"    Course Name: {course.get('course_name', 'N/A')}\n"
+        #         formatted_message += f"    Credits: {course.get('credits', 'N/A')}\n"
+        #         formatted_message += f"\n"
+        print(formatted_message)
 
         sns_message = {
             "scheduled_info": formatted_message,
@@ -144,7 +179,7 @@ def create_schedule(uni):
 
         sns.publish(
             TopicArn='arn:aws:sns:us-east-2:256273164694:ScheduleChangeTopic',
-            Message=sns_message,
+            Message=json.dumps(sns_message),
             Subject="New Schedule Created",
             MessageStructure='string'
         )
