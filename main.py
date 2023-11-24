@@ -124,19 +124,29 @@ def create_schedule(uni):
         # Get the auto-generated document ID from the tuple
         new_document_id = new_schedule_ref[1].id
 
-        # Publish a message to SNS
+        new_schedule_doc_ref = schedules_ref.document(new_document_id)
+        new_schedule_doc = new_schedule_doc_ref.get()
+
+        # Construct the text message with all details
+        formatted_message = (
+            "Hello,\nYour new schedule was created. Here is your copy:\n\n"
+            f"Name: {new_schedule_doc.get('name', 'N/A')}\n"
+            f"Degree: {new_schedule_doc.get('degree', 'N/A')}\n"
+            f"Major 1: {new_schedule_doc.get('major1','N/A')}\n"
+            f"Planned Semesters: {new_schedule_doc.get('planned_semesters', 'N/A')}\n"
+            f"Previous Semesters: {new_schedule_doc.get('previous_semesters', 'N/A')}\n"
+            # Include other fields as needed
+        )
+
+        # Publish a message to SNS with only the formatted message
         sns_message = {
-            "schedule_info": {
-                "schedule_id": new_document_id,
-                "name": schedule_data.get("name", "N/A"),
-                "degree": schedule_data.get("degree", "N/A"),
-            },
-            "email_address": schedule_data.get("email_id", "N/A")
+            "scheduled_info": formatted_message
         }
 
         sns.publish(
             TopicArn='arn:aws:sns:us-east-2:256273164694:ScheduleChangeTopic',
-            Message=json.dumps(sns_message),
+            Message=sns_message,
+            Subject="New Schedule Created",
             MessageStructure='string'
         )
 
