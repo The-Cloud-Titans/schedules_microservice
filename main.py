@@ -132,15 +132,14 @@ def create_schedule(uni):
             "Hello,\nYour new schedule was created. Here is your copy:\n\n"
             f"Name: {new_schedule_doc.get('name', 'N/A')}\n"
             f"Degree: {new_schedule_doc.get('degree', 'N/A')}\n"
-            f"Major 1: {new_schedule_doc.get('major1','N/A')}\n"
+            f"Major 1: {new_schedule_doc.get('major1', 'N/A')}\n"
             f"Planned Semesters: {new_schedule_doc.get('planned_semesters', 'N/A')}\n"
             f"Previous Semesters: {new_schedule_doc.get('previous_semesters', 'N/A')}\n"
-            # Include other fields as needed
         )
 
-        # Publish a message to SNS with only the formatted message
         sns_message = {
-            "scheduled_info": formatted_message
+            "scheduled_info": formatted_message,
+            "email_address": schedule_data.get("email_id", "N/A")
         }
 
         sns.publish(
