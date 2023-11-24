@@ -133,12 +133,13 @@ def create_schedule(uni):
 
         # Extracting planned_semesters information
         planned_semesters = new_schedule_doc.get('planned_semesters', [])
-        previous_semesters = new_schedule_doc.get('previous_semesters',[])
+       # previous_semesters = new_schedule_doc.get('previous_semesters',[])
 
         # Constructing formatted_message
         formatted_message = (
             "Hello,\nYour new schedule was created. Here is your copy:\n\n"
             f"Name: {new_schedule_doc.get('name', 'N/A')}\n"
+            f"Email: {new_schedule_doc.get('email_id', 'N/A')}\n"
             f"Degree: {new_schedule_doc.get('degree', 'N/A')}\n"
             f"Major 1: {new_schedule_doc.get('major1', 'N/A')}\n"
             "Planned Semesters:\n"
@@ -173,8 +174,7 @@ def create_schedule(uni):
         print(formatted_message)
 
         sns_message = {
-            "scheduled_info": formatted_message,
-            "email_address": schedule_data.get("email_id", "N/A")
+            "scheduled_info": formatted_message
         }
 
         sns.publish(
