@@ -120,10 +120,9 @@ def create_schedule(uni):
         # Add the schedule to Firestore
         schedules_ref = db.collection("schedules")
         new_schedule_ref = schedules_ref.add(schedule_data)
-        print(new_schedule_ref)
+
         # Get the auto-generated document ID from the tuple
         new_document_id = new_schedule_ref[1].id
-        print("new_document_id="+new_document_id)
 
         # Get the document reference from the tuple
         new_schedule_doc_ref = new_schedule_ref[1]
@@ -133,7 +132,6 @@ def create_schedule(uni):
 
         # Extracting planned_semesters information
         planned_semesters = new_schedule_doc.get('planned_semesters', [])
-       # previous_semesters = new_schedule_doc.get('previous_semesters',[])
 
         # Constructing formatted_message
         formatted_message = (
