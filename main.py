@@ -158,20 +158,9 @@ def create_schedule(uni):
                 formatted_message += f"    Credits: {course.get('credits', 'N/A')}\n"
                 formatted_message += f"\n"
 
-        # formatted_message += "\nPrevious Semesters:\n"
-        # # Iterating through each semester
-        # for semester in previous_semesters:
-        #     formatted_message += f"  Semester: {semester['semester']}\n"
-        #     formatted_message += f"  Max Credits: {semester['max_credits']}\n"
-        #
-        #     # Iterating through each course in the semester
-        #     formatted_message += "  Courses:\n"
-        #     for course in semester.get('courses', []):
-        #         formatted_message += f"    Course Code: {course.get('course_code', 'N/A')}\n"
-        #         formatted_message += f"    Course Name: {course.get('course_name', 'N/A')}\n"
-        #         formatted_message += f"    Credits: {course.get('credits', 'N/A')}\n"
-        #         formatted_message += f"\n"
-        print(formatted_message)
+        formatted_message += f"Regards,\n"
+        formatted_message +="UniTrackerPro Team"
+
 
         sns_message = {
             "scheduled_info": formatted_message
@@ -179,7 +168,7 @@ def create_schedule(uni):
 
         sns.publish(
             TopicArn='arn:aws:sns:us-east-2:256273164694:ScheduleChangeTopic',
-            Message=json.dumps(sns_message),
+            Message=sns_message['scheduled_info'],
             Subject="New Schedule Created",
             MessageStructure='string'
         )
