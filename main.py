@@ -1,6 +1,5 @@
 from flask import Flask, jsonify, request
 from db import db, fetch_data
-from sns_email import notify_schedule_creation
 
 # If `entrypoint` is not defined in app.yaml, App Engine will look for an app
 # called `app` in `main.py`.
