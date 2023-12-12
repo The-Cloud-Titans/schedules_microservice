@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 from db import db, fetch_data
 import boto3
 import json
@@ -8,6 +9,7 @@ sns = boto3.client('sns', region_name='us-east-2')
 # If `entrypoint` is not defined in app.yaml, App Engine will look for an app
 # called `app` in `main.py`.
 app = Flask(__name__)
+CORS(app)
 
 @app.get("/")
 def hello():
