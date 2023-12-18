@@ -9,4 +9,3 @@ google-cloud-firestore==2.3.2
 # dotenv for managing environment variables
 python-dotenv==0.19.1
 boto3
-flask-cors
