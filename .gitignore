@@ -1,1 +1,4 @@
 schedules-database-7f043841f362.json
+terraform.tfvars
+.terraform
+.terraform.lock.hcl
