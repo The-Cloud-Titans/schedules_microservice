@@ -37,6 +37,6 @@ resource "aws_instance" "public_terraform_instance" {
   key_name = aws_key_pair.key_pair.key_name
 
   tags = {
-    Name = "public_terraform_instance"
+    Name = "terraform_schedules_microservice_instance"
   }
 }
