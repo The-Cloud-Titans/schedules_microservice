@@ -22,9 +22,12 @@ jobs:
         uses: webfactory/ssh-agent@v0.8.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Check repository contents
+        run: ls -R
 
       - name: Deploy to EC2
         run: |
+            echo "HOST: $HOST, USERNAME: $USERNAME, SSH_PRIVATE_KEY: $SSH_PRIVATE_KEY"
             cd schedules_microservice
             git pull origin main
             pip install -r requirements.txt
