@@ -39,7 +39,7 @@ jobs:
             python3 main.py &
             app_pid=$!
             sleep 10
-            response_code=$(curl -s -o /dev/null -w "%{http_code}" http://$EC2_PUBLIC_IP:8080)
+            response_code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080)
             echo "HTTP Status Code: $response_code
             kill $app_pid
             if [ $response_code -eq 200 ]; then
@@ -49,4 +49,4 @@ jobs:
               echo "Error: HTTP Status Code is not 200. Marking the job as failed."
               exit 1
             fi
-          EOF
+EOF
