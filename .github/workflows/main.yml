@@ -1,3 +1,4 @@
+#comment for trigger
 name: Deploy to EC2
 
 on:
@@ -13,7 +14,7 @@ jobs:
       EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
       EC2_PRIVATE_IP: ${{ secrets.EC2_PRIVATE_IP }}
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
