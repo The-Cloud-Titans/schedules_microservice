@@ -14,7 +14,7 @@ CORS(app)
 @app.get("/")
 def hello():
     """Return a friendly HTTP greeting."""
-    return "Hello World!\n"
+    return "Hello World 2!\n"
 
 @app.route("/show_data")
 def show_data():
