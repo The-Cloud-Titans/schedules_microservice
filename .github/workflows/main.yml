@@ -1,4 +1,4 @@
-#comment for trigger
+#comment for trigger 2
 name: Deploy to EC2
 
 on:
