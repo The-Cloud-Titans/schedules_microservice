@@ -36,17 +36,17 @@ jobs:
             cd schedules_microservice
             git pull origin main
             pip install -r requirements.txt
-            python3 main.py
+            python3 main.py &
+            app_pid=$!
+            sleep 10
+            response_code=$(curl -s -o /dev/null -w "%{http_code}" http://$EC2_PUBLIC_IP:8080)
+            echo "HTTP Status Code: $response_code
+            kill $app_pid
+            if [ $response_code -eq 200 ]; then
+              echo "HTTP Status Code is 200. Marking the job as successful."
+              exit 0
+            else
+              echo "Error: HTTP Status Code is not 200. Marking the job as failed."
+              exit 1
+            fi
           EOF
-
-      - name: Check HTTP Status
-        run: |
-          response_code=$(curl -s -o /dev/null -w "%{http_code}" http://$EC2_PUBLIC_IP:8080)
-          echo "HTTP Status Code: $response_code"
-          if [ $response_code -ne 200 ]; then
-            echo "Error: HTTP Status Code is not 200. Marking the job as failed."
-            exit 1
-          else
-            echo "HTTP Status Code is 200. Marking the job as successful."
-            exit 0
-          fi    
