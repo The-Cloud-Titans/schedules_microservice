@@ -23,15 +23,13 @@ jobs:
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          echo -e "Host $EC2_PRIVATE_IP\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+          ssh-keyscan -H $EC2_PRIVATE_IP >> ~/.ssh/known_hosts
 
       - name: Deploy to EC2
         run: |
-          cd schedules_microservice
-          git pull origin main
-          pip install -r requirements.txt
-          python3 main.py
-        env:
-          EC2_PRIVATE_IP: ${{ secrets.EC2_PRIVATE_IP }}
-          EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $EC2_USERNAME@$EC2_PRIVATE_IP 'bash -s' << 'EOF'
+            cd schedules_microservice
+            git pull origin main
+            pip install -r requirements.txt
+            python3 main.py
+          EOF
