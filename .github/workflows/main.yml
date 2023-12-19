@@ -18,6 +18,11 @@ jobs:
         with:
           python-version: 3.11
 
+      - name: Debug
+        run: |
+          echo "Username: $EC2_USERNAME"
+          echo "Private IP: $EC2_PRIVATE_IP"
+          
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh
