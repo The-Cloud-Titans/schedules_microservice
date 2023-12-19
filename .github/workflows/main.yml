@@ -1,30 +1,35 @@
-# name: CI/CD Workflow
-# trigger comment
-# on:
-#   push:
-#     branches:
-#       - main
+name: Deploy to EC2
 
-# jobs:
-#   create_infrastructure:
-#     runs-on: ubuntu-latest
+on:
+  push:
+    branches:
+      - main
 
-#     steps:
-#     - name: Checkout code
-#       uses: actions/checkout@v2
-#       with:
-#         node-version: 16
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
 
-#     - name: Set up Terraform
-#       uses: hashicorp/setup-terraform@v1
-#       with:
-#         terraform_version: 0.15.0
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-#     - name: Create infrastructure
-#       run: |
-#         cd terraform_create
-#         terraform init
-#         terraform apply -auto-approve
-#       env:
-#           TF_VAR_aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#           TF_VAR_aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.11
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H $EC2_PRIVATE_IP >> ~/.ssh/known_hosts
+
+      - name: Deploy to EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $EC2_USERNAME@$EC2_PRIVATE_IP 'bash -s' << 'EOF'
+            cd schedules_microservice
+            git pull origin main
+            pip install -r requirements.txt
+            python3 main.py
+          EOF
