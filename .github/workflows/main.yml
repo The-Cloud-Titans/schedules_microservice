@@ -9,6 +9,11 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    env:
+      EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
+      EC2_PRIVATE_IP: ${{ secrets.EC2_PRIVATE_IP }}
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -22,7 +27,7 @@ jobs:
         run: |
           echo "Username: $EC2_USERNAME"
           echo "Private IP: $EC2_PRIVATE_IP"
-          
+
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh
