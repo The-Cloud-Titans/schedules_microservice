@@ -23,18 +23,15 @@ jobs:
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H $EC2_PRIVATE_IP >> ~/.ssh/known_hosts
-          
-      - name: Configure SSH
-        uses: webfactory/ssh-agent@v0.8.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          echo -e "Host $EC2_PRIVATE_IP\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
 
       - name: Deploy to EC2
         run: |
-          ssh -o StrictHostKeyChecking=no -i ${{ secrets.SSH_PRIVATE_KEY }} ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_PRIVATE_IP }} 'bash -s' << 'EOF'
-            cd schedules_microservice
-            git pull origin main
-            pip install -r requirements.txt
-            python3 main.py
-          EOF
+          cd schedules_microservice
+          git pull origin main
+          pip install -r requirements.txt
+          python3 main.py
+        env:
+          EC2_PRIVATE_IP: ${{ secrets.EC2_PRIVATE_IP }}
+          EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
