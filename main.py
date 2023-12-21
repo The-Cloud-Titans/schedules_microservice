@@ -37,6 +37,7 @@ def get_schedules(uni):
         schedule_info = {
             "schedule_id": schedule.id,
             "name": data.get("name", "N/A"),
+            "schedule_name": data.get("schedule_name","N/A"),
             "email_id": data.get("email_id", "N/A"),
             "degree": data.get("degree", "N/A"),
             "major1": data.get("major1", "N/A"),
@@ -78,6 +79,7 @@ def get_schedule_by_id(uni, schedule_id):
     schedule_info = {
         "schedule_id": schedule_doc.id,
         "name": data.get("name", "N/A"),
+        "schedule_name": data.get("schedule_name","N/A"),
         "email_id": data.get("email_id", "N/A"),
         "degree": data.get("degree", "N/A"),
         "major1": data.get("major1", "N/A"),
@@ -108,7 +110,7 @@ def create_schedule(uni):
         #print(schedule_data)
 
         # Validate that the request contains necessary data
-        required_fields = ["name", "email_id", "degree", "major1", "planned_semesters", "previous_semesters"]
+        required_fields = ["name","schedule_name" "email_id", "degree", "major1", "planned_semesters", "previous_semesters"]
         for field in required_fields:
             if field not in schedule_data:
                 return jsonify({"error": f"Missing required field: {field}"}), 400
@@ -138,6 +140,7 @@ def create_schedule(uni):
         # Constructing formatted_message
         formatted_message = (
             "Hello,\nYour new schedule was created. Here is your copy:\n\n"
+            f"Schedule Name: {new_schedule_doc.get('schedule_name', 'N/A')}\n"
             f"Name: {new_schedule_doc.get('name', 'N/A')}\n"
             f"Email: {new_schedule_doc.get('email_id', 'N/A')}\n"
             f"Degree: {new_schedule_doc.get('degree', 'N/A')}\n"
@@ -195,7 +198,7 @@ def update_schedule(uni, schedule_id):
             return jsonify({"error": f"Schedule with {schedule_id} does not belong to user with uni {uni}"}), 400
 
         # Define fields that are not allowed to be updated
-        fields_not_allowed_to_update = ["name", "email_id", "uni"]
+        fields_not_allowed_to_update = ["name", "email_id", "uni", "schedule_name"]
 
         # Check if request body contains fields not allowed to be updated
         disallowed_fields = set(updated_schedule_data.keys()) & set(fields_not_allowed_to_update)
