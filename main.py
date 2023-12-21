@@ -140,11 +140,11 @@ def create_schedule(uni):
         # Constructing formatted_message
         formatted_message = (
             "Hello,\nYour new schedule was created. Here is your copy:\n\n"
-            f"Schedule Name: {new_schedule_doc.get('schedule_name', 'N/A')}\n"
             f"Name: {new_schedule_doc.get('name', 'N/A')}\n"
             f"Email: {new_schedule_doc.get('email_id', 'N/A')}\n"
             f"Degree: {new_schedule_doc.get('degree', 'N/A')}\n"
-            f"Major 1: {new_schedule_doc.get('major1', 'N/A')}\n"
+            f"Major: {new_schedule_doc.get('major1', 'N/A')}\n"   
+            f"Schedule Name: {new_schedule_doc.get('schedule_name', 'N/A')}\n"
             "Planned Semesters:\n"
         )
 
