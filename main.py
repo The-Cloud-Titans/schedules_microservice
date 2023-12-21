@@ -110,7 +110,7 @@ def create_schedule(uni):
         #print(schedule_data)
 
         # Validate that the request contains necessary data
-        required_fields = ["name","schedule_name" "email_id", "degree", "major1", "planned_semesters", "previous_semesters"]
+        required_fields = ["name","schedule_name", "email_id", "degree", "major1", "planned_semesters", "previous_semesters"]
         for field in required_fields:
             if field not in schedule_data:
                 return jsonify({"error": f"Missing required field: {field}"}), 400
