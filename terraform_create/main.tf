@@ -30,3 +30,13 @@ resource "local_file" "private_key" {
   content = tls_private_key.terraform_rsa_4096.private_key_pem
   filename = var.key_name
 }
+
+resource "aws_instance" "terraform_schedules_microservice_instance" {
+  ami           = "ami-01103fb68b3569475"
+  instance_type = "t2.micro"
+  key_name = aws_key_pair.key_pair.key_name
+
+  tags = {
+    Name = "terraform_schedules_microservice_instance"
+  }
+}
